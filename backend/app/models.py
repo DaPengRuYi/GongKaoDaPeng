@@ -36,7 +36,7 @@ class Question(SQLModel, table=True):
     analysis: str = ""                        # 解析
     difficulty: str = ""                      # easy / medium / hard
     source: str = ""                          # 来源：卷次 + 题号 + 页码
-    is_real: bool = Field(default=True, index=True)  # 是否真题（禁止模拟生成的红线标记）
+    is_real: bool = Field(default=True, index=True)  # 是否真题（true=真题，false=模拟题）
     created_at: datetime = Field(default_factory=datetime.now)
 
 
@@ -47,7 +47,7 @@ class QuestionAttempt(SQLModel, table=True):
     question_id: int = Field(index=True, foreign_key="question.id")
     user_id: Optional[int] = Field(default=None, index=True, foreign_key="user.id")
     chosen: str = ""                          # 用户所选（选择题为字母）
-    is_correct: Optional[bool] = None          # 客观题代码判；主观题走 AI，暂留空
+    is_correct: Optional[bool] = None          # 客观题由代码判分；主观题暂留空，后续接入判分
     time_sec: int = 0                         # 单题用时（秒）
     error_tag: str = ""                        # 错因三桶：读题错 / 知识点错 / 计算错
     created_at: datetime = Field(default_factory=datetime.now)

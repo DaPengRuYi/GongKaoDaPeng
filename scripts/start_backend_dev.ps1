@@ -10,7 +10,18 @@ $BackendDir = Join-Path $ProjectRoot 'backend'
 $VenvDir = Join-Path $BackendDir '.venv'
 $VenvPython = Join-Path (Join-Path $VenvDir 'Scripts') 'python.exe'
 $VenvActivate = Join-Path (Join-Path $VenvDir 'Scripts') 'Activate.ps1'
-$ManagedPython = 'C:/Users/18010/.workbuddy/binaries/python/versions/3.13.12/python.exe'
+# 优先使用 PATH 中的 python 解释器；找不到则回退到环境变量 GKDP_PYTHON
+$ManagedPython = $null
+if (Get-Command python -ErrorAction SilentlyContinue) {
+    $ManagedPython = (Get-Command python).Source
+} elseif (Get-Command python3 -ErrorAction SilentlyContinue) {
+    $ManagedPython = (Get-Command python3).Source
+} elseif ($env:GKDP_PYTHON -and (Test-Path $env:GKDP_PYTHON)) {
+    $ManagedPython = $env:GKDP_PYTHON
+}
+if (-not $ManagedPython) {
+    throw '未找到 Python，请将 python 加入 PATH，或设置环境变量 GKDP_PYTHON 指向解释器'
+}
 
 if (-not (Test-Path $VenvPython)) {
     Write-Host '[setup] 未找到 .venv，正在创建虚拟环境 ...' -ForegroundColor Yellow
