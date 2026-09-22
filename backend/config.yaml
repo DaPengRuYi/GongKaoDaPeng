@@ -1,0 +1,25 @@
+# 公考大鹏 配置中心
+# 所有配置集中在此，代码通过 app.config 读取，避免硬编码。
+
+app:
+  name: 公考大鹏
+  debug: true
+  host: 0.0.0.0
+  port: 8000
+  version: 0.1.0
+
+database:
+  # 开发期用 SQLite，零依赖；上线可换 PostgreSQL/MySQL 连接串
+  url: sqlite:///./gongkao.db
+
+logging:
+  level: INFO
+  file: logs/app.log
+  rotation: 10 MB
+  retention: 7 days
+
+cors:
+  # 前端开发服务器与同域部署的前端
+  allow_origins:
+    - http://localhost:5173
+    - http://localhost:8000
