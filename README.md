@@ -1,5 +1,7 @@
 # 公考大鹏 (GongKaoDaPeng)
 
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL%203.0-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
+
 > 程序员公考提效平台 —— 别人用笔和脑子磨，我们用代码把学习与面试效率拉满。
 
 ## 技术栈
@@ -69,3 +71,13 @@ npm run dev
 ## 首页数据
 
 首页文案由后端 `/api/home` 下发，前端纯展示，便于后续接数据库 / CMS 动态化。
+
+## 贡献
+
+欢迎提交 Issue 与 Pull Request。提交前请确保后端可正常启动、`GET /api/home` 返回 200。
+
+## 许可证
+
+本项目基于 [GNU Affero General Public License v3.0 (AGPL-3.0)](LICENSE) 开源，Copyright (c) 2026 DaPengRuYi。
+
+AGPL-3.0 是 GPL 家族中传染性最强的协议：任何使用本项目代码（包括通过网络以服务形式提供）的用户，都必须开放其完整对应源代码。选择 AGPL-3.0 的原因：本项目核心资产是「程序员公考」的方法论与体系课，开源协议本身即一道护城河——任何人想拿本项目做闭源 SaaS 与考公服务，都必须公开其源码，无法暗中与本项目抢流量、抢用户。
