@@ -1,10 +1,31 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
+import * as Lucide from 'lucide-vue-next'
 import { fetchHome } from '../api/home.js'
 
 const data = ref(null)
 const loading = ref(true)
 const error = ref('')
+
+// 后端只返回图标 name 字符串，前端按 Lucide 注册表动态渲染组件；
+// 未知 name 兜底到 BookOpen，保证永不出现空白图标。
+function iconFor(name) {
+  return Lucide[name] || Lucide.BookOpen
+}
+
+// 功能卡 → 路由映射（后端未返回 to 字段时的兜底；
+// 若后端 features 含 to 字段则优先使用，见 routeFor）。
+const featureRoutes = {
+  Brain: '/quiz',
+  Target: '/quiz',
+  Mic: '/quiz',
+  Network: '/materials'
+}
+function routeFor(f) {
+  if (f.to) return f.to
+  return featureRoutes[f.icon] || '/'
+}
 
 onMounted(async () => {
   try {
@@ -19,15 +40,6 @@ onMounted(async () => {
 
 <template>
   <div class="page">
-    <header class="nav">
-      <div class="brand">🦅 公考大鹏</div>
-      <nav class="links">
-        <a href="#features">能力</a>
-        <a href="#cta">开始</a>
-        <span class="ver" v-if="data">v{{ data.version }}</span>
-      </nav>
-    </header>
-
     <main>
       <section class="hero">
         <p v-if="loading" class="hint">加载中…</p>
@@ -36,27 +48,23 @@ onMounted(async () => {
           <h1 class="title">{{ data.title }}</h1>
           <p class="subtitle">{{ data.subtitle }}</p>
           <p class="slogan">{{ data.slogan }}</p>
-          <a class="cta" :href="data.cta_url" id="cta">{{ data.cta_text }} →</a>
+          <a class="cta" :href="data.cta_url">{{ data.cta_text }} →</a>
         </template>
       </section>
 
-      <section class="features" id="features" v-if="data && data.features">
-        <article
+      <section class="features" v-if="data && data.features">
+        <RouterLink
           v-for="f in data.features"
           :key="f.title"
+          :to="routeFor(f)"
           class="card"
         >
-          <div class="icon">{{ f.icon }}</div>
+          <div class="icon"><component :is="iconFor(f.icon)" :size="34" /></div>
           <h3>{{ f.title }}</h3>
           <p>{{ f.desc }}</p>
-        </article>
+        </RouterLink>
       </section>
     </main>
-
-    <footer class="foot">
-      <span>公考大鹏 · 程序员公考提效平台</span>
-      <span>FastAPI + Vue + SQLModel</span>
-    </footer>
   </div>
 </template>
 
@@ -65,34 +73,6 @@ onMounted(async () => {
   max-width: 1080px;
   margin: 0 auto;
   padding: 0 24px 48px;
-}
-
-.nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 22px 0;
-}
-.brand {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 1px;
-}
-.links {
-  display: flex;
-  gap: 18px;
-  align-items: center;
-  color: var(--text-dim);
-  font-size: 14px;
-}
-.links a:hover {
-  color: var(--accent);
-}
-.ver {
-  border: 1px solid #2c3260;
-  border-radius: 999px;
-  padding: 2px 10px;
-  font-size: 12px;
 }
 
 .hero {
@@ -146,6 +126,8 @@ onMounted(async () => {
   margin-top: 18px;
 }
 .card {
+  display: block;
+  color: inherit;
   background: var(--card);
   border: 1px solid #2a2f5e;
   border-radius: 18px;
@@ -157,7 +139,8 @@ onMounted(async () => {
   border-color: var(--accent);
 }
 .icon {
-  font-size: 34px;
+  color: var(--accent);
+  display: flex;
 }
 .card h3 {
   margin: 12px 0 8px;
@@ -175,16 +158,6 @@ onMounted(async () => {
 }
 .hint.err {
   color: #ff8a8a;
-}
-
-.foot {
-  margin-top: 56px;
-  padding-top: 22px;
-  border-top: 1px solid #232850;
-  display: flex;
-  justify-content: space-between;
-  color: var(--text-dim);
-  font-size: 13px;
 }
 
 @media (max-width: 720px) {

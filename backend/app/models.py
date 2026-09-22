@@ -4,7 +4,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, UniqueConstraint
 
 
 class User(SQLModel, table=True):
@@ -35,9 +35,19 @@ class Question(SQLModel, table=True):
     answer: str = ""                          # 参考答案（选择题为字母，主观题为文本）
     analysis: str = ""                        # 解析
     difficulty: str = ""                      # easy / medium / hard
-    source: str = ""                          # 来源：卷次 + 题号 + 页码
+    source: str = ""                          # 来源：卷次 + 题号 + 页码（去重键之一）
     is_real: bool = Field(default=True, index=True)  # 是否真题（true=真题，false=模拟题）
     created_at: datetime = Field(default_factory=datetime.now)
+
+    # 去重键：同一份真题（科目 + 模块 + 来源 + 题干）只应留一条。
+    # 这里尽量在表定义层面加上唯一约束，让新建表自带唯一性；
+    # 老表（建表时还没约束）由 pipeline 的 CREATE UNIQUE INDEX 补全，二者同名互不冲突。
+    # 权威去重手段始终是 pipeline 里的唯一索引，保证无论表怎么建都不会翻倍。
+    __table_args__ = (
+        UniqueConstraint(
+            "subject", "module", "source", "content", name="uq_question_seed"
+        ),
+    )
 
 
 class QuestionAttempt(SQLModel, table=True):

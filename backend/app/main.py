@@ -10,6 +10,9 @@ from app.config import config
 from app.database import create_db_and_tables
 from app.logging_conf import logger
 from app.routers import home
+from app.routers import quiz
+from app.routers import papers
+from app.routers import materials
 
 
 @asynccontextmanager
@@ -39,6 +42,9 @@ app.add_middleware(
 )
 
 app.include_router(home.router)
+app.include_router(quiz.router)
+app.include_router(papers.router)
+app.include_router(materials.router)
 
 
 @app.get("/")
